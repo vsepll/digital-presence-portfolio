@@ -17,6 +17,7 @@ export default function ContactForm() {
     company: "",
     message: "",
   })
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const { toast } = useToast();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -27,22 +28,48 @@ export default function ContactForm() {
     }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle form submission here
-    console.log(formData)
-    // Reset form
-    setFormData({
-      name: "",
-      email: "",
-      company: "",
-      message: "",
-    })
-    // Show success toast
-    toast({
-      title: "¡Mensaje enviado!",
-      description: "Nos pondremos en contacto contigo pronto.",
-    })
+    setIsSubmitting(true)
+    
+    try {
+      // Submit form data to API endpoint
+      const response = await fetch('/api/submit-form', {
+        method: 'POST',
+        body: JSON.stringify(formData),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      
+      const result = await response.json()
+      
+      if (!response.ok) {
+        throw new Error(result.message || 'Error al enviar el formulario')
+      }
+      
+      // Reset form
+      setFormData({
+        name: "",
+        email: "",
+        company: "",
+        message: "",
+      })
+      
+      // Show success toast
+      toast({
+        title: "¡Mensaje enviado!",
+        description: "Nos pondremos en contacto contigo pronto.",
+      })
+    } catch (error) {
+      toast({
+        title: "Error al enviar",
+        description: error instanceof Error ? error.message : "Hubo un problema al procesar tu solicitud. Por favor, intenta de nuevo.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -103,8 +130,8 @@ export default function ContactForm() {
           className="min-h-[120px] bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500"
         />
       </div>
-      <Button type="submit" size="lg" className="w-full">
-        Quiero mi web gratis <ArrowRight className="ml-2 h-4 w-4" />
+      <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
+        {isSubmitting ? "Enviando..." : "Enviar mensaje"} {!isSubmitting && <ArrowRight className="ml-2 h-4 w-4" />}
       </Button>
     </form>
   )

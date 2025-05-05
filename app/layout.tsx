@@ -7,10 +7,10 @@ import { Toaster } from "@/components/ui/toaster"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata = {
-  title: "Digital Presence | Free Websites, Simple Maintenance",
+  title: "DigitalPresence | Sitios web gratis",
   description:
-    "We help brands and businesses express their full potential with free website design and affordable maintenance.",
-    generator: 'v0.dev'
+    "Ayudamos a marcas y negocios a expresar su potencial completo con diseño de sitios web gratuitos y mantenimiento económico.",
+    generator: 'ValentinOtero'
 }
 
 export default function RootLayout({

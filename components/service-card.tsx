@@ -22,40 +22,44 @@ export default function ServiceCard({ title, description, icon }: ServiceCardPro
   const getIcon = (iconName: string) => {
     switch (iconName) {
       case "Layout":
-        return <Layout className="h-6 w-6" />
+        return <Layout className="h-5 w-5" />
       case "Globe":
-        return <Globe className="h-6 w-6" />
+        return <Globe className="h-5 w-5" />
       case "Palette":
-        return <Palette className="h-6 w-6" />
+        return <Palette className="h-5 w-5" />
       case "ShoppingBag":
-        return <ShoppingBag className="h-6 w-6" />
+        return <ShoppingBag className="h-5 w-5" />
       case "FileText":
-        return <FileText className="h-6 w-6" />
+        return <FileText className="h-5 w-5" />
       case "BarChart":
-        return <BarChart className="h-6 w-6" />
+        return <BarChart className="h-5 w-5" />
       case "Shield":
-        return <Shield className="h-6 w-6" />
+        return <Shield className="h-5 w-5" />
       case "Zap":
-        return <Zap className="h-6 w-6" />
+        return <Zap className="h-5 w-5" />
       case "TrendingUp":
-        return <TrendingUp className="h-6 w-6" />
+        return <TrendingUp className="h-5 w-5" />
       default:
-        return <Layout className="h-6 w-6" />
+        return <Layout className="h-5 w-5" />
     }
   }
 
   return (
-    <Card className="border-0 shadow-none hover:bg-neutral-50 transition-colors group">
-      <CardContent className="p-6">
-        <div className="mb-4 p-2 inline-block bg-neutral-100 rounded-md">{getIcon(icon)}</div>
-        <h3 className="text-xl font-semibold mb-2">{title}</h3>
-        <p className="text-neutral-600">{description}</p>
-      </CardContent>
-      <CardFooter className="p-6 pt-0">
-        <div className="text-sm font-medium flex items-center gap-2 text-neutral-900 group-hover:underline">
-          Learn more <ArrowUpRight className="h-4 w-4" />
+    <Card className="border-0 shadow-none hover:bg-secondary transition-colors group">
+      <CardContent className="p-4">
+        <div className="flex items-start gap-4">
+          <div className="p-2.5 bg-primary/10 dark:bg-primary/20 text-primary rounded-md flex-shrink-0">
+            {getIcon(icon)}
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold mb-1">{title}</h3>
+            <p className="text-sm text-muted-foreground">{description}</p>
+            <div className="text-xs font-medium flex items-center gap-1 text-primary group-hover:underline mt-2">
+              Ver más <ArrowUpRight className="h-3 w-3" />
+            </div>
+          </div>
         </div>
-      </CardFooter>
+      </CardContent>
     </Card>
   )
 }

@@ -1,3 +1,5 @@
+"use client"
+
 import Link from "next/link"
 import { ArrowRight, ArrowUpRight, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -5,69 +7,146 @@ import ServiceCard from "@/components/service-card"
 import WorkCard from "@/components/work-card"
 import ContactForm from "@/components/contact-form"
 import Image from "next/image"
+import React, { useEffect, useState } from "react"
+import { ThemeToggle } from "@/components/theme-toggle"
+import useScrollSnap from "@/hooks/use-scroll-snap"
+import QuieroWebGratisModal from "@/components/quiero-web-gratis-modal"
 
 export default function Home() {
+  const heroImages = [
+    "/images/hero1.png",
+    "/images/hero2.png",
+    "/images/hero3.png",
+    "/images/hero5.png",
+  ]
+  const [currentImage, setCurrentImage] = useState<number>(0)
+  const [quieroWebModalOpen, setQuieroWebModalOpen] = useState(false)
+  
+  // Define sections for scroll snap
+  const sections = ["hero", "services", "work", "about", "contact"];
+  const { activeSection, scrollToSection } = useScrollSnap(sections, { scrollDelay: 800 });
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImage((prev: number) => (prev + 1) % heroImages.length)
+    }, 30000)
+    return () => clearInterval(interval)
+  }, [])
+
+  // Add section indicator component
+  const SectionIndicator = () => (
+    <div className="fixed right-6 top-1/2 transform -translate-y-1/2 z-40 flex flex-col gap-4">
+      {sections.map((section, index) => (
+        <button
+          key={section}
+          onClick={() => scrollToSection(index)}
+          className={`w-3 h-3 rounded-full transition-all duration-300 shadow-md ${
+            activeSection === index 
+              ? "bg-primary w-4 h-4 scale-110" 
+              : "bg-neutral-400/70 hover:bg-neutral-300 dark:hover:bg-neutral-500"
+          }`}
+          aria-label={`Scroll to ${section} section`}
+        />
+      ))}
+    </div>
+  );
+
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 bg-white/80 backdrop-blur-sm">
+      <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 bg-white/80 backdrop-blur-sm dark:bg-black/80">
         <Link href="/" className="text-xl font-semibold">
           digital<span className="text-neutral-400">presence</span>
         </Link>
         <nav className="hidden md:flex items-center gap-8">
-          <Link href="#services" className="text-sm hover:text-neutral-500 transition-colors">
-            Servicios
-          </Link>
-          <Link href="#work" className="text-sm hover:text-neutral-500 transition-colors">
-            Proyectos
-          </Link>
-          <Link href="#about" className="text-sm hover:text-neutral-500 transition-colors">
-            Sobre nosotros
-          </Link>
-          <Link href="#contact" className="text-sm hover:text-neutral-500 transition-colors">
-            Contacto
-          </Link>
+          {sections.slice(1).map((section, index) => (
+            <button 
+              key={section}
+              onClick={() => scrollToSection(index + 1)}
+              className={`text-sm transition-colors ${
+                activeSection === index + 1 
+                  ? "text-primary font-medium" 
+                  : "hover:text-neutral-500"
+              }`}
+            >
+              {section === "services" ? "Servicios" :
+               section === "work" ? "Proyectos" :
+               section === "about" ? "Sobre nosotros" :
+               section === "contact" ? "Contacto" : section}
+            </button>
+          ))}
         </nav>
-        <Link href="#contact" passHref legacyBehavior>
-          <Button variant="outline" size="sm" className="hidden md:flex">
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <button
+            onClick={() => scrollToSection(4)}
+            className="hidden md:flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+          >
             Hablemos <ArrowUpRight className="ml-2 h-4 w-4" />
+          </button>
+          <Button variant="ghost" size="icon" className="md:hidden">
+            <ChevronDown className="h-5 w-5" />
           </Button>
-        </Link>
-        <Button variant="ghost" size="icon" className="md:hidden">
-          <ChevronDown className="h-5 w-5" />
-        </Button>
+        </div>
       </header>
+
+      {/* Section Indicator */}
+      <SectionIndicator />
+
+      {/* Modal for "Quiero mi web gratis" */}
+      <QuieroWebGratisModal open={quieroWebModalOpen} onOpenChange={setQuieroWebModalOpen} />
 
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="pt-32 pb-20 px-6 md:px-10 lg:px-20 max-w-7xl mx-auto">
-          <div className="flex flex-col items-start gap-8 max-w-3xl">
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tight">
-              Sitios web gratis. <br />
-              Potencial ilimitado.
-            </h1>
-            <p className="text-lg md:text-xl text-neutral-600 max-w-2xl">
-              Ayudamos a marcas y negocios a expresar su máximo potencial con diseño web gratuito y mantenimiento asequible.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 mt-4">
-              <Link href="#services" passHref legacyBehavior>
-                <Button variant="outline" size="lg" className="rounded-full px-8">
-                  Nuestros servicios
+        <section id="hero" className="h-screen w-full flex items-center justify-center px-6 md:px-10 lg:px-20 max-w-7xl mx-auto">
+          <div className="flex flex-col-reverse md:flex-row items-center justify-between w-full gap-16">
+            <div className="flex-1 flex flex-col items-start gap-8 max-w-4xl mr-8">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tight text-left">
+                Sitios web gratis. <br />
+                <span className="whitespace-nowrap">Potencial ilimitado.</span>
+              </h1>
+              <p className="text-lg md:text-xl text-neutral-600 max-w-2xl">
+                Ayudamos a marcas y negocios a expresar su máximo potencial con diseño web gratuito y mantenimiento asequible.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 mt-4">
+                <Button 
+                  onClick={() => setQuieroWebModalOpen(true)}
+                  size="lg" 
+                  className="rounded-full px-8"
+                >
+                  Quiero mi web gratis <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
-              </Link>
+                <Link href="#services" passHref legacyBehavior>
+                  <Button variant="outline" size="lg" className="rounded-full px-8">
+                    Nuestros servicios
+                  </Button>
+                </Link>
+              </div>
+            </div>
+            <div className="flex-1 flex items-center justify-center w-full md:w-[380px] lg:w-[420px] h-[320px] md:h-[420px] lg:h-[480px] ml-16">
+              <div className="w-full h-full flex items-center justify-center rounded-3xl border-4 border-dotted border-neutral-500 bg-neutral-50 transition-all duration-500">
+                <Image
+                  src={heroImages[currentImage]}
+                  alt="Hero"
+                  width={400}
+                  height={400}
+                  className="object-contain w-full h-full"
+                  priority
+                />
+              </div>
             </div>
           </div>
         </section>
 
         {/* Services Section */}
-        <section id="services" className="py-20 px-6 md:px-10 lg:px-20 max-w-7xl mx-auto">
-          <div className="flex flex-col gap-4 mb-16">
-            <span className="text-sm text-neutral-500">Nuestro enfoque</span>
-            <h2 className="text-3xl md:text-4xl font-bold">Precios simples y transparentes</h2>
-            <p className="text-lg text-neutral-600 max-w-2xl mt-2">
+        <section id="services" className="min-h-screen flex flex-col justify-center px-6 md:px-10 lg:px-20 max-w-7xl mx-auto">
+          <div className="flex flex-col gap-3 mb-12">
+            <span className="text-sm text-muted-foreground">Nuestro enfoque</span>
+            <h2 className="text-2xl md:text-3xl font-bold">Precios simples y transparentes</h2>
+            <p className="text-base text-muted-foreground max-w-2xl">
               Creemos que un gran diseño no debe ser una barrera. Obtén un sitio web profesional gratis y solo paga por el mantenimiento.
             </p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             <ServiceCard
               title="Diseño web gratuito"
               description="Sitios web profesionales y responsivos diseñados y desarrollados sin costo inicial. Eliminamos la barrera de entrada para negocios de todos los tamaños."
@@ -102,37 +181,27 @@ export default function Home() {
         </section>
 
         {/* Work Section */}
-        <section id="work" className="py-20 px-6 md:px-10 lg:px-20 bg-neutral-50">
+        <section id="work" className="py-20 px-6 md:px-10 lg:px-20 bg-secondary">
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-col gap-4 mb-16">
-              <span className="text-sm text-neutral-500">Nuestro trabajo</span>
+              <span className="text-sm text-muted-foreground">Nuestro trabajo</span>
               <h2 className="text-3xl md:text-4xl font-bold">Proyectos seleccionados</h2>
             </div>
-            <div className="grid md:grid-cols-2 gap-8">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               <WorkCard
-                title="Rebranding panadería artesanal"
-                category="Identidad de marca, Diseño web"
+                title="Rebranding Panadería Artesanal"
+                category="Identidad de marca • Diseño Web • UX/UI"
                 imageUrl="/placeholder.svg?key=8eve2"
               />
               <WorkCard
-                title="Plataforma startup tecnológica"
-                category="Desarrollo web, Diseño UX"
+                title="App Móvil Fitness"
+                category="Desarrollo • App Móvil • UI/UX"
                 imageUrl="/placeholder.svg?key=teqx4"
               />
               <WorkCard
-                title="E-commerce de moda de lujo"
-                category="E-commerce, Estrategia digital"
+                title="E-commerce Moda"
+                category="E-commerce • Diseño Web • SEO"
                 imageUrl="/placeholder.svg?key=kob4b"
-              />
-              <WorkCard
-                title="Interfaz app de bienestar"
-                category="Diseño UI, App móvil"
-                imageUrl="/placeholder.svg?key=cpdnw"
-              />
-              <WorkCard
-                title="Sistema de Parking Parkr"
-                category="App de reservas, UX/UI Design"
-                imageUrl="/placeholder.jpg"
               />
             </div>
           </div>
@@ -142,37 +211,37 @@ export default function Home() {
         <section id="about" className="py-20 px-6 md:px-10 lg:px-20 max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <div>
-              <div className="h-[70vh] bg-neutral-100 rounded-xl overflow-hidden relative">
-                <div className="absolute inset-0 flex items-center justify-center text-neutral-400 text-xl">
+              <div className="h-[70vh] bg-secondary rounded-xl overflow-hidden relative">
+                <div className="absolute inset-0 flex items-center justify-center text-muted-foreground text-xl">
                   Foto del equipo
                 </div>
               </div>
             </div>
             <div className="flex flex-col gap-8">
-              <span className="text-sm text-neutral-500">Nuestra misión</span>
+              <span className="text-sm text-muted-foreground">Nuestra misión</span>
               <h2 className="text-3xl md:text-4xl font-bold">Ayudamos a las marcas a expresar su máximo potencial</h2>
-              <p className="text-lg text-neutral-600">
+              <p className="text-lg text-muted-foreground">
                 Creemos que todo negocio merece un gran sitio web. Nuestra misión es eliminar las barreras financieras que impiden que las marcas expresen todo su potencial online.
               </p>
-              <p className="text-lg text-neutral-600">
+              <p className="text-lg text-muted-foreground">
                 Ofreciendo diseño web gratuito y cobrando solo por el mantenimiento, hemos creado un modelo que hace accesible la presencia profesional en la web para todos: desde startups hasta empresas consolidadas que buscan renovar su identidad digital.
               </p>
               <div className="grid grid-cols-2 gap-8 mt-4">
                 <div>
                   <h3 className="text-5xl font-bold mb-2">100+</h3>
-                  <p className="text-neutral-600">Sitios web gratuitos entregados</p>
+                  <p className="text-muted-foreground">Sitios web gratuitos entregados</p>
                 </div>
                 <div>
                   <h3 className="text-5xl font-bold mb-2">92%</h3>
-                  <p className="text-neutral-600">Tasa de retención de clientes</p>
+                  <p className="text-muted-foreground">Tasa de retención de clientes</p>
                 </div>
                 <div>
                   <h3 className="text-5xl font-bold mb-2">24h</h3>
-                  <p className="text-neutral-600">Tiempo de respuesta de soporte</p>
+                  <p className="text-muted-foreground">Tiempo de respuesta de soporte</p>
                 </div>
                 <div>
                   <h3 className="text-5xl font-bold mb-2">$0</h3>
-                  <p className="text-neutral-600">Costo de diseño inicial</p>
+                  <p className="text-muted-foreground">Costo de diseño inicial</p>
                 </div>
               </div>
             </div>
@@ -180,7 +249,7 @@ export default function Home() {
         </section>
 
         {/* Contact Section */}
-        <section id="contact" className="py-20 px-6 md:px-10 lg:px-20 bg-neutral-900 text-white">
+        <section id="contact" className="py-20 px-6 md:px-10 lg:px-20 bg-neutral-900 text-white dark:bg-black">
           <div className="max-w-7xl mx-auto">
             <div className="grid md:grid-cols-2 gap-16">
               <div className="flex flex-col gap-8">
@@ -192,12 +261,13 @@ export default function Home() {
                 <div className="mt-8">
                   <div className="mb-6">
                     <h3 className="text-xl font-semibold mb-2">Correo electrónico</h3>
-                    <p className="text-neutral-300">hello@digitalpresence.com</p>
+                    <p className="text-neutral-300">contacto@presenciadigital.com</p>
                   </div>
-                  <div className="mb-6">
+                  {/* descomentar cuando tengamos un teléfono */}
+                  {/* <div className="mb-6">
                     <h3 className="text-xl font-semibold mb-2">Teléfono</h3>
                     <p className="text-neutral-300">+1 (555) 123-4567</p>
-                  </div>
+                  </div> */}
                 </div>
               </div>
               <div>
@@ -208,25 +278,29 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="bg-neutral-900 text-white py-12 px-6 md:px-10 lg:px-20">
+      <footer className="bg-neutral-900 text-white py-12 px-6 md:px-10 lg:px-20 dark:bg-black">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
             <Link href="/" className="text-xl font-semibold">
               digital<span className="text-neutral-400">presence</span>
             </Link>
             <nav className="flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-8">
-              <Link href="#services" className="text-sm text-neutral-300 hover:text-white transition-colors">
-                Servicios
-              </Link>
-              <Link href="#work" className="text-sm text-neutral-300 hover:text-white transition-colors">
-                Proyectos
-              </Link>
-              <Link href="#about" className="text-sm text-neutral-300 hover:text-white transition-colors">
-                Sobre nosotros
-              </Link>
-              <Link href="#contact" className="text-sm text-neutral-300 hover:text-white transition-colors">
-                Contacto
-              </Link>
+              {sections.slice(1).map((section, index) => (
+                <button 
+                  key={section}
+                  onClick={() => scrollToSection(index + 1)}
+                  className={`text-sm text-neutral-300 hover:text-white transition-colors ${
+                    activeSection === index + 1 
+                      ? "font-medium" 
+                      : ""
+                  }`}
+                >
+                  {section === "services" ? "Servicios" :
+                   section === "work" ? "Proyectos" :
+                   section === "about" ? "Sobre nosotros" :
+                   section === "contact" ? "Contacto" : section}
+                </button>
+              ))}
             </nav>
             <div className="flex items-center gap-4">
               <Button variant="ghost" size="icon" className="text-white">
@@ -304,7 +378,7 @@ export default function Home() {
             </div>
           </div>
           <div className="mt-12 pt-8 border-t border-neutral-800 text-sm text-neutral-400">
-            <p>© 2025 Digital Presence. Todos los derechos reservados.</p>
+            <p>© 2025 Digital Presence <span className="font-bold">LLC</span>. Todos los derechos reservados.</p>
           </div>
         </div>
       </footer>
