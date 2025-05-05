@@ -26,7 +26,8 @@ export default function Home() {
   const sections = ["hero", "services", "work", "about", "contact"];
   const { activeSection, scrollToSection, isMobile } = useScrollSnap(sections, { 
     scrollDelay: 800,
-    mobileScrollDelay: 600
+    mobileScrollDelay: 600,
+    disableOnMobile: true
   });
   
   useEffect(() => {

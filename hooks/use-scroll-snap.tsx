@@ -3,13 +3,18 @@ import { useEffect, useState } from 'react';
 interface UseScrollSnapOptions {
   scrollDelay?: number;
   mobileScrollDelay?: number;
+  disableOnMobile?: boolean;
 }
 
 const useScrollSnap = (sectionIds: string[] = [], options: UseScrollSnapOptions = {}) => {
   const [activeSection, setActiveSection] = useState<number>(0);
   const [isScrolling, setIsScrolling] = useState<boolean>(false);
   const [isMobile, setIsMobile] = useState<boolean>(false);
-  const { scrollDelay = 1000, mobileScrollDelay = 600 } = options;
+  const { 
+    scrollDelay = 1000, 
+    mobileScrollDelay = 600,
+    disableOnMobile = true 
+  } = options;
 
   // Detect mobile devices
   useEffect(() => {
@@ -53,6 +58,16 @@ const useScrollSnap = (sectionIds: string[] = [], options: UseScrollSnapOptions 
     sections.forEach(section => {
       if (section) observer.observe(section);
     });
+
+    // If mobile and disableOnMobile is true, don't add wheel or touch handlers
+    if (isMobile && disableOnMobile) {
+      // Only observe sections for tracking active section
+      return () => {
+        sections.forEach(section => {
+          if (section) observer.unobserve(section);
+        });
+      };
+    }
 
     // Handle wheel events for smooth magnetic scrolling
     const handleWheel = (e: WheelEvent) => {
@@ -178,8 +193,8 @@ const useScrollSnap = (sectionIds: string[] = [], options: UseScrollSnapOptions 
     window.addEventListener('wheel', handleWheel, { passive: false });
     window.addEventListener('keydown', handleKeyDown);
     
-    // Add touch event listeners for mobile
-    if (isMobile) {
+    // Add touch event listeners for mobile (only if not disabled)
+    if (isMobile && !disableOnMobile) {
       window.addEventListener('touchstart', handleTouchStart, { passive: true });
       window.addEventListener('touchend', handleTouchEnd, { passive: true });
     }
@@ -188,7 +203,7 @@ const useScrollSnap = (sectionIds: string[] = [], options: UseScrollSnapOptions 
       window.removeEventListener('wheel', handleWheel);
       window.removeEventListener('keydown', handleKeyDown);
       
-      if (isMobile) {
+      if (isMobile && !disableOnMobile) {
         window.removeEventListener('touchstart', handleTouchStart);
         window.removeEventListener('touchend', handleTouchEnd);
       }
@@ -197,7 +212,7 @@ const useScrollSnap = (sectionIds: string[] = [], options: UseScrollSnapOptions 
         if (section) observer.unobserve(section);
       });
     };
-  }, [sectionIds, activeSection, isScrolling, scrollDelay, mobileScrollDelay, isMobile]);
+  }, [sectionIds, activeSection, isScrolling, scrollDelay, mobileScrollDelay, isMobile, disableOnMobile]);
 
   // Function to scroll to a specific section
   const scrollToSection = (index: number) => {
