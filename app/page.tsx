@@ -38,7 +38,7 @@ export default function Home() {
 
   // Add section indicator component
   const SectionIndicator = () => (
-    <div className={`fixed ${isMobile ? 'right-3 top-1/2' : 'right-6 top-1/2'} transform -translate-y-1/2 z-40 flex flex-col gap-4`}>
+    <div className={`fixed ${isMobile ? 'hidden' : 'right-6 top-1/2'} transform -translate-y-1/2 z-40 flex flex-col gap-4`}>
       {sections.map((section, index) => (
         <button
           key={section}
