@@ -47,13 +47,13 @@ export default function ServiceCard({ title, description, icon }: ServiceCardPro
   return (
     <Card className="border-0 shadow-none hover:bg-secondary transition-colors group">
       <CardContent className="p-4">
-        <div className="flex items-start gap-4">
-          <div className="p-2.5 bg-primary/10 dark:bg-primary/20 text-primary rounded-md flex-shrink-0">
+        <div className="flex items-start gap-3 sm:gap-4">
+          <div className="p-2 sm:p-2.5 bg-primary/10 dark:bg-primary/20 text-primary rounded-md flex-shrink-0">
             {getIcon(icon)}
           </div>
           <div>
-            <h3 className="text-lg font-semibold mb-1">{title}</h3>
-            <p className="text-sm text-muted-foreground">{description}</p>
+            <h3 className="text-base sm:text-lg font-semibold mb-1">{title}</h3>
+            <p className="text-xs sm:text-sm text-muted-foreground line-clamp-3 sm:line-clamp-none">{description}</p>
             <div className="text-xs font-medium flex items-center gap-1 text-primary group-hover:underline mt-2">
               Ver más <ArrowUpRight className="h-3 w-3" />
             </div>
